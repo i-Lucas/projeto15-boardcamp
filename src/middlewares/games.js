@@ -2,7 +2,6 @@ import { PostGamesSchema } from '../schemas/games.js';
 
 export function GetGamesMiddleware(req, res, next) {
 
-    console.log('GetGamesMiddleware');
     next();
 }
 

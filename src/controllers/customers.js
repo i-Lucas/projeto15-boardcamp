@@ -46,13 +46,8 @@ export async function PostCustomersController(req, res) {
 
 export async function PutCustomersController(req, res) {
 
-    console.log('PutCustomersController');
-
     const { id } = req.params;
     const { name, phone, cpf, birthday } = req.body;
-
-    console.log(id);
-    console.log(name, phone, cpf, birthday);
 
     const uid = id.replace(/\s/g, '');
     if (!uid) return res.status(400).send('Empty user ID.');

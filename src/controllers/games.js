@@ -9,7 +9,7 @@ export async function GetGamesController(req, res) {
         const GamesList = await db.query(`
 
             SELECT games.*,
-            categories.name AS "categoryName",
+            categories.name AS "categoryName"
             
             FROM games
             JOIN categories ON games."categoryId" = categories.id` );
@@ -19,8 +19,7 @@ export async function GetGamesController(req, res) {
             const GetGamesFromName = await db.query(`SELECT * FROM games WHERE name LIKE '%${name}%'`);
             return res.status(200).send(GetGamesFromName.rows);
         }
-
-        //const GamesList = await db.query("SELECT * FROM games");
+        
         return res.status(200).send(GamesList.rows);
 
     } catch (err) { return res.status(500).send('Error accessing database during GetCategoriesController.'); }

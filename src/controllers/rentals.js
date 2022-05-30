@@ -96,6 +96,7 @@ export async function FinalizeRentController(req, res) {
 
     const { id } = req.params;
     const returnDate = new Date().toLocaleDateString('pt-br');
+    const returnDateFormatted = returnDate.split('/').reverse().join('-');
 
     try {
 
@@ -104,7 +105,7 @@ export async function FinalizeRentController(req, res) {
         if (GetThisRental.rows.length === 0) return res.status(400).send('Rental not found');
         if (GetThisRental.rows[0].returnDate) return res.status(400).send('Rental already returned');
 
-        await db.query('UPDATE rentals SET "returnDate" = $1 WHERE id = $2', [returnDate, id]);
+        await db.query('UPDATE rentals SET "returnDate" = $1 WHERE id = $2', [returnDateFormatted, id]);
 
         const daysRented = GetThisRental.rows[0].daysRented;
         const originalPrice = GetThisRental.rows[0].originalPrice;

@@ -3,8 +3,16 @@ import db from '../database/database.js';
 export async function GetCustomersController(req, res) {
 
     const { cpf } = req.query;
+    const { id } = req.params;
 
     try {
+
+        if (id) {
+
+            const GetCustomersFromId = await db.query(`SELECT * FROM customers WHERE id = $1`, [id]);
+            if (GetCustomersFromId.rows.length === 0) return res.status(400).send('User not fond');
+            return res.status(200).send(GetCustomersFromId.rows[0]);
+        }
 
         if (cpf) {
 
@@ -16,7 +24,6 @@ export async function GetCustomersController(req, res) {
         return res.send(CustomersList.rows);
 
     } catch (err) { return res.status(500).send('Error accessing database during GetCustomersController.'); }
-
 }
 
 export async function PostCustomersController(req, res) {
@@ -35,27 +42,33 @@ export async function PostCustomersController(req, res) {
         return res.sendStatus(201);
 
     } catch (err) { return res.status(500).send('Error accessing database during PostCustomersController.'); }
-
 }
 
-
 export async function PutCustomersController(req, res) {
+
+    console.log('PutCustomersController');
 
     const { id } = req.params;
     const { name, phone, cpf, birthday } = req.body;
 
+    console.log(id);
+    console.log(name, phone, cpf, birthday);
+
     const uid = id.replace(/\s/g, '');
-    if(!uid) return res.status(400).send('Empty user ID.');
+    if (!uid) return res.status(400).send('Empty user ID.');
 
     if (!Number.isInteger(Number(uid))) return res.status(400).send('Invalid user ID.');
-   
+
     try {
 
         const ValidateCustomer = await db.query("SELECT * FROM customers WHERE id = $1", [uid]);
         if (ValidateCustomer.rows.length === 0) return res.status(404).send('User not found.');
 
         const ValidateCPF = await db.query("SELECT * FROM customers WHERE cpf = $1", [cpf]);
-        if (ValidateCPF.rows.length > 0) return res.status(409).send('User CPF already exists.');
+      
+        if (ValidateCustomer.rows[0].cpf !== cpf) {
+            if (ValidateCPF.rows.length > 0) return res.status(409).send('User CPF already exists.');
+        }
 
         await db.query('UPDATE customers SET name = $1, phone = $2, cpf = $3, "birthday" = $4 WHERE id = $5;', [name, phone, cpf, birthday, uid]);
         res.sendStatus(200);

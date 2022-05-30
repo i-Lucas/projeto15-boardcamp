@@ -4,7 +4,7 @@ export async function PostRentalController(req, res) {
 
     const { customerId, gameId, daysRented } = req.body;
     const rentDate = new Date().toLocaleDateString('pt-br');
-    console.log(rentDate);
+    const rentDateFormatted = rentDate.split('/').reverse().join('-');
 
     try {
 
@@ -19,7 +19,7 @@ export async function PostRentalController(req, res) {
         const InsertRental = await db.query(`
 
             INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") 
-            VALUES ($1, $2, $3, $4, $5, $6, $7)`, [customerId, gameId, rentDate, daysRented, null, originalPrice, null]);
+            VALUES ($1, $2, $3, $4, $5, $6, $7)`, [customerId, gameId, rentDateFormatted, daysRented, null, originalPrice, null]);
 
         if (InsertRental.rowCount === 0) return res.status(400).send('Error on insert new rental');
         res.sendStatus(201);

@@ -23,7 +23,7 @@ export async function PostRentalController(req, res) {
         if (InsertRental.rowCount === 0) return res.status(400).send('Error on insert new rental');
         res.sendStatus(201);
 
-    } catch (err) { return res.status(500).send('Error accessing database during PostRentalController.'); }
+    } catch (err) { return res.status(500).send(`Error accessing database during PostRentalController. \n\n${err}`); }
 }
 
 export async function GetRentalsController(req, res) {

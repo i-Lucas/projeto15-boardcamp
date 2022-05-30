@@ -5,7 +5,19 @@ export async function GetCustomersController(req, res) {
     const { cpf } = req.query;
     const { id } = req.params;
 
+    let { offset, limit } = req.query;
+    if (!offset) offset = 0;
+    if (!limit) limit = 10;
+
     try {
+
+        if (offset !== 0 || limit !== 10) {
+
+            const sendResults = [];
+            const categories = await db.query(`SELECT * FROM customers ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`);
+            categories.rows.forEach(category => sendResults.push(category));
+            return res.send(sendResults);
+        }
 
         if (id) {
 
@@ -60,7 +72,7 @@ export async function PutCustomersController(req, res) {
         if (ValidateCustomer.rows.length === 0) return res.status(404).send('User not found.');
 
         const ValidateCPF = await db.query("SELECT * FROM customers WHERE cpf = $1", [cpf]);
-      
+
         if (ValidateCustomer.rows[0].cpf !== cpf) {
             if (ValidateCPF.rows.length > 0) return res.status(409).send('User CPF already exists.');
         }

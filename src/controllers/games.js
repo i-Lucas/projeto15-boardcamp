@@ -3,11 +3,30 @@ import db from '../database/database.js';
 export async function GetGamesController(req, res) {
 
     const { name } = req.query;
-    
+    let { offset, limit } = req.query;
+
+    if (!offset) offset = 0;
+    if (!limit) limit = 10;
+
     try {
 
+        if (offset !== 0 || limit !== 10) {
+
+            const sendResults = [];
+            const categories = await db.query(`SELECT * FROM games ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`);
+            categories.rows.forEach(category => sendResults.push(category));
+
+            if(name) {
+
+                const filteredResults = sendResults.filter(game => game.name.toLowerCase().includes(name.toLowerCase()));
+                return res.send(filteredResults);
+            }
+
+            return res.send(sendResults);
+        }
+
         if (name) {
-        
+
             const GetGamesFromName = await db.query(`SELECT * FROM games WHERE name LIKE '%${name}%'`);
             return res.status(200).send(GetGamesFromName.rows);
         }
